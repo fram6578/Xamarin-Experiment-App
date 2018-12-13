@@ -64,13 +64,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ARActivity.cs" />
+    <AndroidAsset Include="Assets\Pin.png" />
+    <AndroidAsset Include="Assets\test2.png" />
+    <AndroidAsset Include="Assets\default.css" />
+    <AndroidAsset Include="Assets\ade.js" />
+    <AndroidAsset Include="Assets\poitest.js" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\assets\magazine.wtc" />
     <None Include="Resources\AboutResources.txt" />
-    <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml">
       <SubType>Designer</SubType>
     </None>
@@ -107,9 +112,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\test.html">
+    <AndroidAsset Include="Assets\index.html">
       <SubType>Designer</SubType>
-    </Content>
+    </AndroidAsset>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\assets\imageOne.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\assets\surfer.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

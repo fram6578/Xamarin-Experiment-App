@@ -45,7 +45,7 @@ namespace App.Droid
         {
             base.OnPostCreate(savedInstanceState);
             architectView.OnPostCreate();
-            architectView.Load("test.html");
+            architectView.Load("index.html");
         }
 
         protected override void OnResume()
