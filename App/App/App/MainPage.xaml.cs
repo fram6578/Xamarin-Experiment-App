@@ -13,5 +13,10 @@ namespace App
         {
             InitializeComponent();
         }
+
+        private void Button_Clicked()
+        {
+            
+        }
     }
 }

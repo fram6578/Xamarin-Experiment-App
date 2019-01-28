@@ -14,14 +14,18 @@
 </head>
 
 <body>
-<div id="infoBox" class="info">
-    <div class="text">Scan Target &#35;1 (surfer):</div>
-    <div class="icons">
-        <img src='Pin.png'/>
-    </div>
-</div>
-<div id="loadingMessage" class="info">Loading ...</div>
 
 <script src="poitest.js"></script>
+
+<!-- small status-button -->
+<a style="text-align:right;" id="popupInfoButton" href="#popupInfo" data-rel="popup" data-role="button"
+  class="ui-icon-alt" data-inline="true" data-transition="pop" data-icon="alert" data-theme="e"
+  data-iconpos="notext">Log</a>
+  
+<!-- popup displayed when button clicked -->
+<div data-role="popup" id="popupInfo" class="ui-content" data-theme="e" style="max-width:350px;">
+    <p style="text-align:right;" id="status-message">Trying to find out where you are</p>
+</div>
+
 </body>
 </HTML>

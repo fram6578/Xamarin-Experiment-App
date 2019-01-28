@@ -1,80 +1,91 @@
+/* Implementation of AR-Experience (aka "World"). */
 var World = {
+    /* True once data was fetched. */
+    initiallyLoadedData: false,
 
-    init: function initFn() {
-		document.getElementById("loadingMessage").style.display = "hfahsdn";
-        this.createOverlays();
-    },
+    /* pOI-Marker asset. */
+    markerDrawableIdle: null,
 
-    createOverlays: function createOverlaysFn() {
-        /*
-            First a AR.TargetCollectionResource is created with the path to the Wikitude Target Collection(.wtc) file.
-            This .wtc file can be created from images using the Wikitude Studio. More information on how to create them
-            can be found in the documentation in the TargetManagement section.
-            Each target in the target collection is identified by its target name. By using this
-            target name, it is possible to create an AR.ImageTrackable for every target in the target collection.
-         */
-        this.targetCollectionResource = new AR.TargetCollectionResource("assets/magazine.wtc", {
-            onError: World.onError
-        });
+    /* Called to inject new POI data. */
+    loadPoisFromJsonData: function loadPoisFromJsonDataFn(poiData) {
 
         /*
-            This resource is then used as parameter to create an AR.ImageTracker. Optional parameters are passed as
-            object in the last argument. In this case a callback function for the onTargetsLoaded trigger is set. Once
-            the tracker loaded all of its target images this callback function is invoked. We also set the callback
-            function for the onError trigger which provides a sting containing a description of the error.
-         */
-        this.tracker = new AR.ImageTracker(this.targetCollectionResource, {
-            onTargetsLoaded: World.showInfoBar,
-            onError: World.onError
-        });
-
-        /*
-            The next step is to create the augmentation. In this example an image resource is created and passed to the
-            AR.ImageDrawable. A drawable is a visual component that can be connected to a Trackable
-            (AR.ImageTrackable, AR.InstantTrackable or AR.ObjectTrackable) or a geolocated object (AR.GeoObject). The
-            AR.ImageDrawable is initialized by the image and its size. Optional parameters allow for transformations
-            relative to the recognized target.
+            The example Image Recognition already explained how images are loaded and displayed in the augmented
+            reality view. This sample loads an AR.ImageResource when the World variable was defined. It will be
+            reused for each marker that we will create afterwards.
         */
-
-        /* Create overlay for page one of the magazine. */
-        var imgOne = new AR.ImageResource("assets/imageOne.png", {
+        World.markerDrawableIdle = new AR.ImageResource("assets/Pin.png", {
             onError: World.onError
         });
-        var overlayOne = new AR.ImageDrawable(imgOne, 1, {
-            translate: {
-                x: -0.15
+
+        /*
+            For creating the marker a new object AR.GeoObject will be created at the specified geolocation. An
+            AR.GeoObject connects one or more AR.GeoLocations with multiple AR.Drawables. The AR.Drawables can be
+            defined for multiple targets. A target can be the camera, the radar or a direction indicator. Both the
+            radar and direction indicators will be covered in more detail in later examples.
+        */
+        //var markerLocation = new AR.GeoLocation(poiData.latitude, poiData.longitude);
+        var markerLocation = new AR.GeoLocation(40.0150, 105.2705);
+        var markerImageDrawableIdle = new AR.ImageDrawable(World.markerDrawableIdle, 2.5, {
+            zOrder: 0,
+            opacity: 1.0
+        });
+
+        /* Create GeoObject. */
+        var markerObject = new AR.GeoObject(markerLocation, {
+            drawables: {
+                cam: [markerImageDrawableIdle]
             }
         });
 
-        /*
-            The last lines combine everything by creating an AR.ImageTrackable with the previously created tracker,
-            the name of the image target and the drawable that should augment the recognized image.
+        /* Updates status message as a user feedback that everything was loaded properly. */
+        World.updateStatusMessage('1 place loaded');
+    },
 
-            Important: If you replace the tracker file with your own, make sure to change the target name accordingly.
-            Use a specific target name to respond only to a certain target or use a wildcard to respond to any or a
-            certain group of targets.
-        */
-        this.pageOne = new AR.ImageTrackable(this.tracker, "pageOne", {
-            drawables: {
-                cam: overlayOne
-            },
-            onImageRecognized: World.hideInfoBar,
-            onError: World.onError
+    /* Updates status message shown in small "i"-button aligned bottom center. */
+    updateStatusMessage: function updateStatusMessageFn(message, isWarning) {
+
+        var themeToUse = isWarning ? "e" : "c";
+        var iconToUse = isWarning ? "alert" : "info";
+
+        $("#status-message").html(message);
+        $("#popupInfoButton").buttonMarkup({
+            theme: themeToUse,
+            icon: iconToUse
         });
+    },
+
+    /* Location updates, fired every time you call architectView.setLocation() in native environment. */
+    locationChanged: function locationChangedFn(lat, lon, alt, acc) {
+
+        /*
+            The custom function World.onLocationChanged checks with the flag World.initiallyLoadedData if the
+            function was already called. With the first call of World.onLocationChanged an object that contains geo
+            information will be created which will be later used to create a marker using the
+            World.loadPoisFromJsonData function.
+        */
+        if (!World.initiallyLoadedData) {
+            /* Creates a poi object with a random location near the user's location. */
+            var poiData = {
+                "id": 1,
+                "longitude": (lon + (Math.random() / 5 - 0.1)),
+                "latitude": (lat + (Math.random() / 5 - 0.1)),
+                "altitude": 100.0
+            };
+
+            World.loadPoisFromJsonData(poiData);
+            World.initiallyLoadedData = true;
+        }
     },
 
     onError: function onErrorFn(error) {
         alert(error)
-    },
-
-    hideInfoBar: function hideInfoBarFn() {
-        document.getElementById("infoBox").style.display = "none";
-    },
-
-    showInfoBar: function worldLoadedFn() {
-        document.getElementById("infoBox").style.display = "table";
-        document.getElementById("loadingMessage").style.display = "none";
     }
 };
 
-World.init();
+/* 
+    Set a custom function where location changes are forwarded to. There is also a possibility to set
+    AR.context.onLocationChanged to null. In this case the function will not be called anymore and no further
+    location updates will be received.
+*/
+AR.context.onLocationChanged = World.locationChanged;
